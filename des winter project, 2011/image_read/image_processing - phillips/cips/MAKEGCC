@@ -1,0 +1,611 @@
+
+
+##########################################################
+#
+#   21 June 1997
+#
+#   GNU make (the DJGPP version of it)
+#
+#
+# GNU Make version 3.75, by Richard Stallman and Roland McGrath.
+# Copyright (C) 1988, 89, 90, 91, 92, 93, 94, 95, 96
+#       Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.
+# There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+#
+# Report bugs to <bug-gnu-utils@prep.ai.mit.edu>.
+
+############################################################
+#
+#   H E L L O
+#
+#   This is the basic test program
+#
+
+HELLOSRC = hello.c hello2.c hello3.c
+HELLOO   = ${HELLOSRC:.c=.o}
+
+hello.exe: ${HELLOO}
+	${LINK} $@ ${HELLOO}
+
+
+
+
+##########################################################
+#
+#   Conversion from Microsoft to GNU makefile
+#
+#   ( -> {
+#   ) -> }
+#   obj -> o
+#
+#
+#   to compile and link a single file program
+#   
+#   gcc mfile.c -o myfile.exe -lm
+#
+#   where the -lm links in math for trig
+#
+#   to compile a C or C++ source file into an object file
+#
+#   gcc -o Wall myfile.c
+#   gcc -c Wall myfile.cc
+#
+#   to link several C objects
+#
+#   gcc -o myprog.exe sub1.o sub2.o sub3.o
+#
+#   to link several C++ objects
+#
+#   gxx -o myprog.exe sub1.o sub2.o sub3.o
+#
+#
+#
+#   This is how to make a program.
+#      list the source files
+#   BASSRC = mainas.c addsub.c imageio.c
+#      turn the .c files into .o object files
+#   BASOBJ  = ${BASSRC:.c=.o}
+#   mainas.exe: ${BASOBJ}
+#      ${LINK}  mainas.exe ${BASOBJ} 
+#
+#
+############################################################
+#
+#   Define the basic macros
+#
+#
+
+LIB      = -lm
+CC       = gcc
+COMPILE  = gcc -c
+LINK     = gcc -o
+PLUSLINK = gxx -o
+MAKEFILE = -f makegcc
+
+
+######################################################
+
+###############################################
+#
+#      C O M P O S I T E   F I L E S
+#
+#  Composite files are like small libraries.
+#  A composite file contains several .c file
+#  concatenated together.  This makes the
+#  command lines shorter for linking the .o
+#  files into .exe files.
+#
+#  The cipscat program {see end of makefile}
+#  concatenates these together automatically.
+#
+#
+#
+#
+#  COMPOSITE FILE
+#  tiffs.c = rtiff.c + wtiff.c + tiff.c
+tiffs.o :  tiffs.c cips.h
+	${COMPILE} tiffs.c
+
+tiffs.c: rtiff.c  wtiff.c  tiff.c
+	cipscat rtiff.c  wtiff.c  tiff.c -o tiffs.c
+
+
+
+#  COMPOSITE FILE
+# cips2.c = rstring + mof + mrw + gpcips
+#           + numcvrt + strappnd
+#
+#   The above was changed to the below
+#   12 May 1993
+#
+# cips2.c = gpcips + numcvrt + mymsc.c
+cips2.o :  cips2.c cips.h
+	${COMPILE} cips2.c
+
+cips2.c: gpcips.c numcvrt.c mymsc.c
+	cipscat gpcips.c numcvrt.c mymsc.c -o cips2.c
+
+
+
+#  COMPOSITE FILE
+# cips3.c = addsub + cutp + rotate
+cips3.o :  cips3.c cips.h
+	${COMPILE} cips3.c
+
+cips3.c: addsub.c cutp.c rotate.c
+	cipscat addsub.c cutp.c rotate.c -o cips3.c
+
+
+
+#  COMPOSITE FILE
+# cips4.c = gin + fwrite + hist + pi + ht
+#
+#   The above was changed to the below
+#   12 May 1993
+#
+# cips4.c = gin + hist + pi + ht
+cips4.o :  cips4.c cips.h
+	${COMPILE} cips4.c
+
+cips4.c: gin.c  hist.c  pi.c  ht.c
+	cipscat gin.c hist.c pi.c ht.c -o cips4.c
+
+
+
+#  COMPOSITE FILE
+# cips5.c = boole + overlay + txtrsubs
+cips5.o :  cips5.c cips.h
+	${COMPILE} cips5.c
+
+cips5.c: boole.c overlay.c txtrsubs.c
+	cipscat boole.c overlay.c txtrsubs.c -o cips5.c
+
+
+
+#  COMPOSITE FILE
+# cips6.c = filter + display + djet + scale
+cips6.o :  cips6.c cips.h
+	${COMPILE} cips6.c
+
+cips6.c: filter.c display.c djet.c scale.c
+	cipscat filter.c display.c djet.c scale.c -o cips6.c
+
+
+
+#  COMPOSITE FILE
+# cips7.c = filter + display + djet + scale
+cips7.o :  cips7.c cips.h
+	${COMPILE} cips7.c
+
+cips7.c: ed.c skeleton.c segment.c segment2.c
+	cipscat ed.c skeleton.c segment.c segment2.c -o cips7.c
+
+
+
+#  COMPOSITE FILE
+# edges.c = edge.c + edge2.c + edge3.c
+edges.o :  edges.c cips.h
+	${COMPILE} edges.c
+
+edges.c: edge.c edge2.c edge3.c
+	cipscat edge.c edge2.c edge3.c -o edges.c
+
+
+
+
+######################################################
+#
+#     C I P S C A T
+#
+#   The cipscat program concatenates .c files together
+#   but only copies the first occurance of the
+#   include cips.h statement.  This allows you to put
+#   together files such as addsub.c cutp.c rotate.c
+#   into cips3.c with one command:
+#   cipscat addsub.c cutp.c rotate.c -o cips3.c
+
+cipscat.o: cipscat.c
+	${CC} cipscat.c
+
+cipscat.exe: cipscat.c
+	${CC} cipscat.c -o cipscat.exe ${LIB}
+
+
+######################################################
+#
+#      C I P S   P R O G R A M S
+#
+#   Special make targets:
+#      allip - makes all .exe's - may not work because
+#              the compiler runs out of heap space and
+#              things like that.  Use the makeall.bat
+#              file to do this
+#
+#      cleanobj - deletes all the .o   files
+#      cleanexe - deletes all the .exe files
+#
+#make -f makegcc cips.exe
+
+
+allip :
+	make -f makegcc cipscat.exe
+	make -f makegcc medge.exe
+	make -f makegcc mfilter.exe
+	make -f makegcc mainas.exe
+	make -f makegcc maincp.exe
+	make -f makegcc side.exe
+	make -f makegcc stretch.exe
+	make -f makegcc create.exe
+	make -f makegcc mainseg.exe
+	make -f makegcc main2seg.exe 
+	make -f makegcc pattern.exe
+	make -f makegcc boolean.exe
+	make -f makegcc mainover.exe
+	make -f makegcc invert.exe
+	make -f makegcc mainsk.exe
+	make -f makegcc ilabel.exe
+	make -f makegcc hidet.exe
+	make -f makegcc header.exe
+	make -f makegcc stega.exe
+	make -f makegcc texture.exe
+	make -f makegcc geometry.exe
+	make -f makegcc warp.exe
+	make -f makegcc scstereo.exe
+	make -f makegcc cstereo.exe
+	make -f makegcc pstereo.exe
+	make -f makegcc spstereo.exe
+	make -f makegcc tcomment.exe
+	make -f makegcc change.exe
+	make -f makegcc showi.exe
+	make -f makegcc dumpi.exe
+	make -f makegcc dumpb.exe
+	make -f makegcc histeq.exe
+	make -f makegcc halftone.exe
+	make -f makegcc stretch.exe
+	make -f makegcc tif2bmp.exe
+	make -f makegcc bmp2tif.exe
+	make -f makegcc himage.exe
+	make -f makegcc round.exe
+	make -f makegcc emboss.exe
+
+cleanobj:
+	del *.o
+
+cleanexe:
+	del *.exe
+
+
+######################################################
+#
+#      Define the files needed by CIPS
+#      First define the C source files and then
+#      define the object files and link files
+#      in terms of the source files.
+#
+#      If you add any files to cips, you only
+#      need to add them to CIPSSRC.
+#
+#              17 October 1992
+
+CIPSSRC = tiffs.c edges.c \
+cips.c cips2.c cips3.c cips4.c cips5.c cips6.c \
+cips7.c fitt.c geosubs.c warpsubs.c \
+tcommsub.c  changesu.c
+
+CIPSOBJ  = ${CIPSSRC:.c=.o}
+
+cips.exe: ${CIPSOBJ}
+	${LINK} cips.exe ${CIPSOBJ}
+
+
+
+
+######################################################
+#
+#     Define the stand alone application programs
+#     in a similar manner as cips above.
+
+
+
+
+
+
+
+XMSRC  = xemboss.c imageio.c 
+XMOBJ  = ${XMSRC:.c=.o}
+xemboss.exe: ${XMOBJ}
+	 ${LINK} xemboss.exe ${XMOBJ} 
+
+ISOSRC  = iso.c imageio.c 
+ISOOBJ  = ${ISOSRC:.c=.o}
+iso.exe: ${ISOOBJ}
+	 ${LINK} iso.exe ${ISOOBJ} 
+
+ISO2SRC  = iso2.c imageio.c 
+ISO2OBJ  = ${ISO2SRC:.c=.o}
+iso2.exe: ${ISO2OBJ}
+	 ${LINK} iso2.exe ${ISO2OBJ} 
+
+FLPSRC  = flip.c imageio.c 
+FLPOBJ  = ${FLPSRC:.c=.o}
+flip.exe: ${FLPOBJ}
+	 ${LINK} flip.exe ${FLPOBJ} 
+
+CUTSRC  = cut.c imageio.c 
+CUTOBJ  = ${CUTSRC:.c=.o}
+cut.exe: ${CUTOBJ}
+	 ${LINK} cut.exe ${CUTOBJ} 
+
+
+
+
+
+
+
+TSRC  = imageio.c texture.c \
+        txtrsubs.c utility.c fitt.c
+TOBJ  = ${TSRC:.c=.o}
+texture.exe: ${TOBJ}
+	${LINK} texture.exe ${TOBJ} 
+
+
+GSRC  = geometry.c geosubs.c imageio.c
+GOBJ  = ${GSRC:.c=.o}
+geometry.exe: ${GOBJ}
+	${LINK} geometry.exe ${GOBJ} 
+
+
+WSRC  = warp.c warpsubs.c geosubs.c imageio.c
+WOBJ  = ${WSRC:.c=.o}
+warp.exe: ${WOBJ}
+	${LINK} warp.exe ${WOBJ} 
+
+
+DBSRC  = dumpb.c imageio.c
+DBOBJ  = ${DBSRC:.c=.o}
+dumpb.exe: ${DBOBJ}
+	${LINK}  dumpb.exe ${DBOBJ} 
+
+
+DISRC  = dumpi.c imageio.c
+DIOBJ  = ${DISRC:.c=.o}
+dumpi.exe: ${DIOBJ}
+	${LINK}  dumpi.exe ${DIOBJ} 
+
+
+SISRC  = showi.c imageio.c
+SIOBJ  = ${SISRC:.c=.o}
+showi.exe: ${SIOBJ}
+	${LINK}  showi.exe ${SIOBJ} 
+
+
+HTSRC  = halftone.c ht.c imageio.c
+HTOBJ  = ${HTSRC:.c=.o}
+halftone.exe: ${HTOBJ}
+	${LINK}  halftone.exe ${HTOBJ} 
+
+
+
+maincp: maincp.exe
+MCPSRC  = imageio.c maincp.c cutp.c
+MCPOBJ  = ${MCPSRC:.c=.o}
+maincp.exe: ${MCPOBJ}
+	${LINK}  maincp.exe ${MCPOBJ} 
+
+
+
+SDSRC  = side.c imageio.c
+SDOBJ  = ${SDSRC:.c=.o}
+side.exe: ${SDOBJ}
+	${LINK} side.exe ${SDOBJ} 
+
+
+
+STSRC  = imageio.c geosubs.c stretch.c
+STOBJ  = ${STSRC:.c=.o}
+stretch.exe: ${STOBJ}
+	${LINK}  stretch.exe ${STOBJ} 
+
+
+
+CRSRC  =  imageio.c create.c
+CROBJ  = ${CRSRC:.c=.o}
+create.exe: ${CROBJ}
+	${LINK}  create.exe ${CROBJ} 
+
+
+
+TBSRC  =  imageio.c tif2bmp.c
+TBOBJ  = ${TBSRC:.c=.o}
+tif2bmp.exe: ${TBOBJ}
+	${LINK}  tif2bmp.exe ${TBOBJ} 
+
+
+
+BTSRC  =  imageio.c bmp2tif.c
+BTOBJ  = ${BTSRC:.c=.o}
+bmp2tif.exe: ${BTOBJ}
+	${LINK}  bmp2tif.exe ${BTOBJ} 
+
+
+
+IHSRC  =  imageio.c himage.c hist.c
+IHOBJ  = ${IHSRC:.c=.o}
+himage.exe: ${IHOBJ}
+	${LINK}  himage.exe ${IHOBJ} 
+
+
+
+PATSRC  = pattern.c imageio.c
+PATOBJ  = ${PATSRC:.c=.o}
+pattern.exe: ${PATOBJ}
+	${LINK}  pattern.exe ${PATOBJ} 
+
+
+
+MAIN2SRC  = edge2.c edge3.c segment.c \
+            edge.c filter.c main2seg.c hist.c segment2.c \
+            utility.c imageio.c
+MAIN2OBJ  = ${MAIN2SRC:.c=.o}
+main2seg.exe: ${MAIN2OBJ}
+	${LINK} main2seg.exe ${MAIN2OBJ} 
+
+
+
+SEGSRC = imageio.c hist.c mainseg.c \
+         utility.c segment.c 
+SEGOBJ  = ${SEGSRC:.c=.o}
+mainseg.exe: ${SEGOBJ}
+	${LINK}  mainseg.exe ${SEGOBJ} 
+
+
+
+BOOLSRC  = boolean.c boole.c imageio.c
+BOOLOBJ  = ${BOOLSRC:.c=.o}
+boolean.exe: ${BOOLOBJ}
+	${LINK}  boolean.exe ${BOOLOBJ} 
+
+
+
+OVERSRC  = mainover.c overlay.c imageio.c
+OVEROBJ  = ${OVERSRC:.c=.o}
+mainover.exe: ${OVEROBJ}
+	${LINK}  mainover.exe ${OVEROBJ} 
+
+
+
+INVSRC  = invert.c imageio.c
+INVOBJ  = ${INVSRC:.c=.o}
+invert.exe: ${INVOBJ}
+	${LINK}  invert.exe ${INVOBJ} 
+
+
+
+SKSRC  = mainsk.c imageio.c \
+         skeleton.c ed.c  utility.c
+SKOBJ  = ${SKSRC:.c=.o}
+mainsk.exe: ${SKOBJ}
+	${LINK}  mainsk.exe ${SKOBJ} 
+
+
+
+ILSRC  = ilabel.c imageio.c
+ILOBJ  = ${ILSRC:.c=.o}
+ilabel.exe: ${ILOBJ}
+	${LINK}  ilabel.exe ${ILOBJ} 
+
+
+
+HESRC  = header.c tiffs.c cips2.c
+HEOBJ  = ${HESRC:.c=.o}
+header.exe: ${HEOBJ}
+	${LINK}  header.exe ${HEOBJ} 
+
+
+
+BMSRC  = medge.c edge.c edge2.c edge3.c imageio.c utility.c
+BMOBJ  = ${BMSRC:.c=.o}
+medge.exe: ${BMOBJ}
+	${LINK}  medge.exe ${BMOBJ} 
+
+
+
+BASSRC = mainas.c addsub.c imageio.c
+BASOBJ  = ${BASSRC:.c=.o}
+mainas: mainas.exe
+mainas.exe: ${BASOBJ}
+	${LINK}  mainas.exe ${BASOBJ} 
+
+
+
+BMFSRC  = mfilter.c filter.c imageio.c utility.c
+BMFOBJ  = ${BMFSRC:.c=.o}
+mfilter.exe: ${BMFOBJ}
+	${LINK}  mfilter.exe ${BMFOBJ} 
+
+
+
+BRSRC  = round.c imageio.c
+BROBJ  = ${BRSRC:.c=.o}
+round.exe: ${BROBJ}
+	${LINK}  round.exe ${BROBJ} 
+
+
+
+HQSRC  = histeq.c hist.c imageio.c
+HQOBJ  = ${HQSRC:.c=.o}
+histeq.exe: ${HQOBJ}
+	${LINK}  histeq.exe ${HQOBJ} 
+
+
+
+BSGSRC  = stega.c imageio.c
+BSGOBJ  = ${BSGSRC:.c=.o}
+stega.exe: ${BSGOBJ}
+	${LINK}  stega.exe ${BSGOBJ} 
+
+
+
+BHDSRC  = hidet.c imageio.c
+BHDOBJ  = ${BHDSRC:.c=.o}
+hidet.exe: ${BHDOBJ}
+	${LINK}  hidet.exe ${BHDOBJ} 
+
+
+
+LSRC  = mainl.c lambert.c imageio.c utility.c
+LOBJ  = ${LSRC:.c=.o}
+lambert.exe: ${LOBJ}
+	 ${LINK} lambert.exe ${LOBJ} 
+
+
+
+MSRC  = emboss.c imageio.c 
+MOBJ  = ${MSRC:.c=.o}
+emboss.exe: ${MOBJ}
+	 ${LINK} emboss.exe ${MOBJ} 
+
+
+
+CSSRC  = cstereo.c
+CSOBJ  = ${CSSRC:.c=.o}
+cstereo.exe: ${CSOBJ}
+	 ${LINK} cstereo.exe ${CSOBJ} 
+
+
+
+PSSRC  = pstereo.c imageio.c
+PSOBJ  = ${PSSRC:.c=.o}
+pstereo.exe: ${PSOBJ}
+	 ${LINK} pstereo.exe ${PSOBJ} 
+
+
+
+SCSSRC  = scstereo.c
+SCSOBJ  = ${SCSSRC:.c=.o}
+scstereo.exe: ${SCSOBJ}
+	 ${LINK} scstereo.exe ${SCSOBJ} 
+
+
+
+SPSSRC  = spstereo.c imageio.c
+SPSOBJ  = ${SPSSRC:.c=.o}
+spstereo.exe: ${SPSOBJ}
+	 ${LINK} spstereo.exe ${SPSOBJ} 
+
+
+
+TCSRC = tiffs.c tcomment.c tcommsub.c
+TCOBJ  = ${TCSRC:.c=.o}
+tcomment.exe: ${TCOBJ}
+	 ${LINK} tcomment.exe ${TCOBJ} 
+
+
+
+CHSRC = change.c imageio.c
+CHOBJ  = ${CHSRC:.c=.o}
+change.exe: ${CHOBJ}
+	 ${LINK} change.exe ${CHOBJ} 
+

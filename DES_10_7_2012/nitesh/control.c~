@@ -1,0 +1,17 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "new_image_lib.h"
+
+int main ( void )
+{
+    bmp_image *bmp;
+    image *img;
+    char *input_filename = "me.bmp";
+  
+    bmp = read_bmp ( input_filename );
+
+    img = image_from_bmp ( bmp );
+    negative_of_image ( img );
+    return 0;
+}
